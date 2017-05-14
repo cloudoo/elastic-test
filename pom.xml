@@ -1,0 +1,128 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.csair.bi</groupId>
+	<artifactId>elastic-test</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<modules>
+		<module>elastic-app</module>
+		<module>elastic-web</module>
+	</modules>
+
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch -->
+			<dependency>
+				<groupId>org.elasticsearch</groupId>
+				<artifactId>elasticsearch</artifactId>
+				<version>5.3.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.elasticsearch.client</groupId>
+				<artifactId>transport</artifactId>
+				<version>5.3.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.elasticsearch.client</groupId>
+				<artifactId>rest</artifactId>
+				<version>5.3.2</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-api</artifactId>
+				<version>2.7</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-core</artifactId>
+				<version>2.7</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+					<encoding>UTF8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<!-- 为了让WAR打包插件设定包名称不带版本号 -->
+					<warName>${project.artifactId}</warName>
+					<archive>
+						<!-- 为了在生成的MANIFEST.MF文件中添加Class-Path -->
+						<manifest>
+							<addClasspath>true</addClasspath>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<configuration>
+
+					<httpConnector>
+						<port>${jetty.port}</port>
+					</httpConnector>
+					<!-- <connectors> <connector implementation="org.eclipse.jetty.server.bio.SelectChannelConnector"> 
+						<port>${jetty.port}</port> </connector> <connector implementation="org.eclipse.jetty.server.ssl.SslSelectChannelConnector"> 
+						<port>9443</port> <password>bigroup@2015</password> </connector> </connectors> -->
+					<useTestClasspath>false</useTestClasspath>
+					<webAppConfig>
+						<contextPath>/</contextPath>
+						<!-- 修改了默认属性，防止静态文件被jetty锁定 -->
+						<defaultsDescriptor>src/main/webapp/WEB-INF/webdefault.xml</defaultsDescriptor>
+					</webAppConfig>
+
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<configuration>
+					<port>${jetty.port}</port>
+					<path>${jetty.context.path}</path>
+					<useTestClasspath>false</useTestClasspath>
+				</configuration>
+			</plugin>
+
+		</plugins>
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+			<!-- 只为了将webapp目录也被添加进eclipse的源码视图中 -->
+			<testResource>
+				<directory>src/main/webapp</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>WEB-INF/web*.xml</include>
+				</includes>
+			</testResource>
+		</testResources>
+	</build>
+
+
+</project>
