@@ -13,6 +13,17 @@ import java.util.List;
 public class ElasticSearchFactoryTest {
 
     @Test
+    public void test2(){
+        ElasticSearchFactory elasticSearchFactory = new ElasticSearchFactory();
+        String index ="my_index";
+        String type="my_type";
+        long id = 3;
+        String filePath = "S:\\oa_search\\pdf\\60477505.pdf";
+
+        String test = elasticSearchFactory.indexDocument(index,type,id,filePath);
+        System.out.print(test);
+    }
+    @Test
     public void test() {
 
         ElasticSearchFactory elasticSearchFactory = new ElasticSearchFactory();

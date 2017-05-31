@@ -1,15 +1,21 @@
 package com.csair.bi.es;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import java.util.Date;
+
+
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpHost;
 import org.apache.http.client.config.RequestConfig;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
@@ -27,6 +33,8 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
+
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 public class ElasticSearchFactory {
 
@@ -77,14 +85,33 @@ public class ElasticSearchFactory {
 	}
 	}
 
-	public String indexDocument(String index,String type,long id,String filePath) {
+
+
+
+	public String indexDocument(String index,String type,long id,String filePath)  {
+
+
+
 
 		IndexResponse response = null;
-//		transportClient.prepareBulk().add(IndexRequestBuilder)
-//			response = transportClient.prepareIndexRequest("collectionName").setId(dto.getId())
-//					.setSource(XContentFactory.jsonBuilder().jsonBuilder().startObject()
-//							.field("file", Base64.encodeFromFile(filePath))
-//s							.endObject()).setRefresh(true).execute().actionGet();
+
+		try {
+			File file = new File(filePath);
+			byte[] bytes = loadFile(file);
+			byte[] encoded = Base64.encodeBase64(bytes);
+
+			response = transportClient.prepareIndex(index,type)
+					.setSource(jsonBuilder().startObject()
+							.field("pipeline","attachment")
+							.field("data", encoded)
+							.endObject()).setId(String.valueOf(id)).execute().actionGet();
+
+		} catch (ElasticsearchException e) {
+			//
+		} catch (IOException e) {
+			//
+		}
+
 
 		return response.getId();
 	}
@@ -95,6 +122,7 @@ public class ElasticSearchFactory {
 //		String json = 	mapper.writeValueAsString(object);
 
 		IndexResponse response = transportClient.prepareIndex(index,type).setSource(json, XContentType.JSON).get();
+
 		if(response.status().equals(DocWriteResponse.Result.CREATED)){
 			return true;
 		}else
@@ -132,7 +160,7 @@ public class ElasticSearchFactory {
 		try {
 
 
-			XContentBuilder builder = XContentFactory.jsonBuilder()
+			XContentBuilder builder = jsonBuilder()
 				    .startObject()
 				        .field("first_name", "leisy")
 				        .field("last_name", "lei")
@@ -171,8 +199,31 @@ public class ElasticSearchFactory {
 		}
 	
 	}
-	
-	
+
+	private static byte[] loadFile(File file) throws IOException {
+		InputStream is = new FileInputStream(file);
+
+		long length = file.length();
+		if (length > Integer.MAX_VALUE) {
+			// File is too large
+		}
+		byte[] bytes = new byte[(int)length];
+
+		int offset = 0;
+		int numRead = 0;
+		while (offset < bytes.length
+				&& (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
+			offset += numRead;
+		}
+
+		if (offset < bytes.length) {
+			throw new IOException("Could not completely read file "+file.getName());
+		}
+
+		is.close();
+		return bytes;
+	}
+
 	public static void main(String[] args){
 		ElasticSearchFactory esf = new ElasticSearchFactory();
 		esf.test();
