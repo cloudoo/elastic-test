@@ -17,8 +17,18 @@ public class ElasticSearchFactoryTest {
         ElasticSearchFactory elasticSearchFactory = new ElasticSearchFactory();
         String index ="my_index";
         String type="my_type";
-        long id = 3;
-        String filePath = "S:\\oa_search\\pdf\\60477505.pdf";
+        long id = 31;
+        String filePath = "S:\\oa_search\\txt\\JAVA开发环境配置步骤.txt";//2
+        filePath = "S:\\oa_search\\txt\\LICENSE.sax.txt";// txt中文ingest 会有问题
+//          filePath = "S:\\oa_search\\pdf\\60477505.pdf";//3
+        filePath = "S:\\\\oa_search\\\\pdf\\\\60478869.pdf";//31
+//        filePath = "D:\\03_工作文件\\02_研究院\\01_项目\\00_大数据平台\\00_项目文档\\12_外包\\月度工作绩效评价表-大数据项目组-5月份(1).xls";//4
+//       filePath = "S:\\oa_search\\wps\\16022200568_5.wps"; //5
+//        filePath = "S:\\oa_search\\doc\\60548130.doc";//6
+//        filePath = "S:\\oa_search\\docx\\15121700818_12.docx";//7
+//        filePath = "S:\\oa_search\\ppt\\1507657.ppt";//8
+//        filePath = "S:\\oa_search\\rtf\\1202081.rtf";//9
+//        filePath = "S:\\oa_search\\tif\\15102800589_7.tif";//10 无法解析
 
         String test = elasticSearchFactory.indexDocument(index,type,id,filePath);
         System.out.print(test);
@@ -28,22 +38,22 @@ public class ElasticSearchFactoryTest {
 
         ElasticSearchFactory elasticSearchFactory = new ElasticSearchFactory();
 
-        Document doc = new Document();
+            Document doc = new Document();
 
-        doc.setId(1234);
-        doc.setCategory("测试");
+            doc.setId(1234);
+            doc.setCategory("测试");
 
 //        elasticSearchFactory.index();
-        OaDocumentFacotry test = new OaDocumentFacotry();
+            OaDocumentFacotry test = new OaDocumentFacotry();
 
-        List<Attachment> attachmentList = test.getAttachmentDateFromFile();
-        List<String> urls = test.getTempDocUrl("S:\\oa_search");
+            List<Attachment> attachmentList = test.getAttachmentDateFromFile();
+            List<String> urls = test.getTempDocUrl("S:\\oa_search");
 
-        List<Attachment> testAtts = new ArrayList<Attachment>();
-        for (int i = 0; i < urls.size(); i++) {
-            Attachment att = attachmentList.get(i);
-            att.setUrl(urls.get(i));
-            testAtts.add(att);
+            List<Attachment> testAtts = new ArrayList<Attachment>();
+            for (int i = 0; i < urls.size(); i++) {
+                Attachment att = attachmentList.get(i);
+                att.setUrl(urls.get(i));
+                testAtts.add(att);
         }
 
         System.out.println(testAtts.size());

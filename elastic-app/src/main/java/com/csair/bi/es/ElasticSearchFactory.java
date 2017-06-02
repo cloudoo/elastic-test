@@ -98,12 +98,11 @@ public class ElasticSearchFactory {
 		try {
 			File file = new File(filePath);
 			byte[] bytes = loadFile(file);
-			byte[] encoded = Base64.encodeBase64(bytes);
+//			byte[] encoded = Base64.encodeBase64(bytes);
 
 			response = transportClient.prepareIndex(index,type)
 					.setSource(jsonBuilder().startObject()
-							.field("pipeline","attachment")
-							.field("data", encoded)
+							.field("data", bytes)
 							.endObject()).setId(String.valueOf(id)).execute().actionGet();
 
 		} catch (ElasticsearchException e) {
