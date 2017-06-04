@@ -68,15 +68,17 @@ public class ElasticSearchFactory {
 
 	public void transportClientInit(){
 
-		Settings settings = Settings.builder()
-				.put("cluster.name", "oa-test-app").build();
-		try{
+//		Settings settings = Settings.builder()
+//				.put("cluster.name", "oa-test-app").build();
+        Settings settings = Settings.builder()
+                .put("cluster.name","elastic-cluster1").build();
+        try{
 
 
 		transportClient = new PreBuiltTransportClient(settings)
-				.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.95.68.183"), 9300))
-				.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.95.68.84"), 9300))
-				.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.95.68.85"), 9300));
+//				.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.95.68.183"), 9300))
+//				.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.95.68.84"), 9300))
+				.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("127.0.0.1"), 9300));
 
 		} catch (UnknownHostException e) {
 		e.printStackTrace();
@@ -88,7 +90,7 @@ public class ElasticSearchFactory {
 
 
 
-	public String indexDocument(String index,String type,long id,String filePath)  {
+	public String indexDocument(String index,String type,String pipeline,long id,String filePath)  {
 
 
 
@@ -103,7 +105,8 @@ public class ElasticSearchFactory {
 			response = transportClient.prepareIndex(index,type)
 					.setSource(jsonBuilder().startObject()
 							.field("data", bytes)
-							.endObject()).setId(String.valueOf(id)).execute().actionGet();
+							.endObject()).setPipeline(pipeline)
+					.setId(String.valueOf(id)).execute().actionGet();
 
 		} catch (ElasticsearchException e) {
 			//
